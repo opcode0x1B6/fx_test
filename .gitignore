@@ -1,3 +1,4 @@
 target
 *.blend?
-src/res/button*.png
+src/res/*.png
+

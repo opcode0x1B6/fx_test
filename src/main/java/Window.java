@@ -28,11 +28,21 @@ public class Window extends Application {
     
     Media buttonClickSound;
     MediaPlayer mediaPlayer;
+    
+    AbstractPowerplant powerplant;
+    NeedleMeter meter;
 
     public void onButtonClick(MouseEvent e) {
     	ImageButton clickedButton = (ImageButton)e.getSource();
     	this.mediaPlayer = new MediaPlayer(this.buttonClickSound); // the mediaplayer seems to be unable to stop so we regenerate it
     	clickedButton.setState(!clickedButton.getState());
+    	
+    	if (clickedButton.getId() == "#imgButton1")  {
+    		powerplant.setMotorStatus(clickedButton.getState());
+    	} else {
+    		powerplant.setBurnerStatus(clickedButton.getState());
+    	}
+    	
     	if (clickedButton.getState()) {
     		clickedButton.setImage(this.img_btn_on);
     	}
@@ -44,6 +54,10 @@ public class Window extends Application {
     
     @Override
     public void start(Stage primaryStage) {
+    
+    	this.powerplant = new AbstractPowerplant();
+    	this.powerplant.start();
+    
     	this.img_btn_off = new Image(new File("res/button_off.png").toURI().toString());
     	this.img_btn_on = new Image(new File("res/button_on.png").toURI().toString());
 
@@ -64,6 +78,19 @@ public class Window extends Application {
 		imgb.setOnMouseClicked(e -> this.onButtonClick(e)); // wtf is this syntax from hell???
 		imgb.setState(false);
 	}
+    	
+    	this.meter = (NeedleMeter)this.root.lookup("#needleMeter");
+    	this.meter.initialize(
+    	new File("res/nm_back.png").toURI().toString(),
+    	new File("res/nm_needle.png").toURI().toString(),
+    	new File("res/nm_front.png").toURI().toString(),
+    	-90.0,
+    	90.0,
+    	0.0,
+    	1000.0
+    	);
+    	
+    	this.powerplant.registerMeter(this.meter);
     	
     	primaryStage.setTitle("Button test");
     	primaryStage.setScene(scene);
