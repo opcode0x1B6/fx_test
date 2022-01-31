@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import com.opcode.fx_test.ImageButton?>
 <?import com.opcode.fx_test.NeedleMeter?>
+<?import com.opcode.fx_test.TripleMeter?>
 
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17">
   <columnConstraints>
@@ -20,6 +21,6 @@
    <children>
       <ImageButton id="imgButton1" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
       <ImageButton id="imgButton2" fitHeight="150.0" fitWidth="173.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" />
-      <NeedleMeter id="needleMeter" GridPane.rowIndex="1" />
+      <TripleMeter id="tripleMeter" GridPane.rowIndex="1" />
    </children>
 </GridPane>
