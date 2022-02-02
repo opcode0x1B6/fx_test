@@ -30,6 +30,7 @@ public class Window extends Application {
     MediaPlayer mediaPlayer;
     
     TripleMeter meter;
+	Vostok vostok;
 
     public void onButtonClick(MouseEvent e) {
     	ImageButton clickedButton = (ImageButton)e.getSource();
@@ -39,6 +40,9 @@ public class Window extends Application {
     	if (clickedButton.getState()) {
     		clickedButton.setImage(this.img_btn_on);
     		this.meter.mapTopValue(100);
+			if (clickedButton.getId().equals("imgButton2")) { // beware the id is without hashtag
+				this.vostok.igniteMainRocket();
+			}
     	}
     	else {
     		clickedButton.setImage(this.img_btn_off);
@@ -50,26 +54,29 @@ public class Window extends Application {
     @Override
     public void start(Stage primaryStage) {
     
+		vostok = new Vostok(new Vector3d(0, 6378000 + 215000, 0), new Vector3d(-1, 0, 0), new Vector3d(7805, 0, 0));
+		vostok.start();
+
     	this.img_btn_off = new Image(new File("res/button_off.png").toURI().toString());
     	this.img_btn_on = new Image(new File("res/button_on.png").toURI().toString());
 
     	this.buttonClickSound = new Media(new File("res/click.mp3").toURI().toString());
     	this.mediaPlayer = new MediaPlayer(this.buttonClickSound);
 
-	try {
-		File inFile = new File("res/root.fxml");
-		FileInputStream fIn = new FileInputStream(inFile);
-		FXMLLoader loader = new FXMLLoader();
-		this.root = loader.load(fIn);
-	    	Scene scene = new Scene(this.root);
-	    	
-	    	String[] nameList = {"#imgButton1", "#imgButton2"}; // reengineer better way to add those infos. this has the elegance of a bison in a china shop
-	    	for (String btnName: nameList) {
-			ImageButton imgb = (ImageButton)this.root.lookup(btnName);
-			imgb.setImage(this.img_btn_off);
-			imgb.setOnMouseClicked(e -> this.onButtonClick(e)); // wtf is this syntax from hell???
-			imgb.setState(false);
-		}
+		try {
+			File inFile = new File("res/root.fxml");
+			FileInputStream fIn = new FileInputStream(inFile);
+			FXMLLoader loader = new FXMLLoader();
+			this.root = loader.load(fIn);
+				Scene scene = new Scene(this.root);
+				
+				String[] nameList = {"#imgButton1", "#imgButton2"}; // reengineer better way to add those infos. this has the elegance of a bison in a china shop
+				for (String btnName: nameList) {
+				ImageButton imgb = (ImageButton)this.root.lookup(btnName);
+				imgb.setImage(this.img_btn_off);
+				imgb.setOnMouseClicked(e -> this.onButtonClick(e)); // wtf is this syntax from hell???
+				imgb.setState(false);
+			}
 	    	
 	    	this.meter = (TripleMeter)this.root.lookup("#tripleMeter");
 	    	this.meter.initialize(
