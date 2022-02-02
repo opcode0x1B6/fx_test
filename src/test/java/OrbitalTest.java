@@ -28,4 +28,16 @@ public class OrbitalTest {
 		Vostok v = new Vostok(new Vector3d(), new Vector3d(), new Vector3d());
 		Assert.assertEquals(9.81, v.getVelocityFromForce(v.getGravitationalForce(v.massEarth, v.massVostok, v.equatorRadius), v.massVostok), 0.3);
 	}
+	
+	@Test
+	public void equatorHeight() {
+		Vostok v = new Vostok(new Vector3d(0, 6378000 + 215000, 0), new Vector3d(), new Vector3d());
+		Assert.assertEquals(215000.0, v.getHeightOverEquator(), 0.0); 
+	}
+	
+	@Test
+	public void airDensityAtZero() {
+		Vostok v = new Vostok(new Vector3d(), new Vector3d(), new Vector3d());
+		Assert.assertEquals(1.2041, v.getAirDensityAtAltitude(0.0), 0.0); 
+	}
 }
