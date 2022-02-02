@@ -83,4 +83,19 @@ public class OrbitalTest {
 		
 		Assert.assertEquals(secondsToImpactA, secondsToImpactB, 0);
 	}
+
+	@Test
+	public void timeOfFlightDeorbitBurn() {
+		Vostok v = new Vostok(new Vector3d(0, 6378000 + 215000, 0), new Vector3d(-1, 0, 0), new Vector3d(7805, 0, 0));
+		v.igniteMainRocket();
+		boolean decayedInTime = false;
+		for (int decayAfterSeconds = 0; decayAfterSeconds < 24 * 60 * 60; decayAfterSeconds++) { // orbit should decay in a day
+			if (v.update(1)) {
+				decayedInTime = true;
+				break;
+			}
+		}
+		
+		Assert.assertTrue("Deorbit burn ", decayedInTime); 
+	}
 }
