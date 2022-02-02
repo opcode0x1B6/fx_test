@@ -38,6 +38,49 @@ public class OrbitalTest {
 	@Test
 	public void airDensityAtZero() {
 		Vostok v = new Vostok(new Vector3d(), new Vector3d(), new Vector3d());
-		Assert.assertEquals(1.2041, v.getAirDensityAtAltitude(0.0), 0.0); 
+		Assert.assertEquals(1.0, v.getAirDensityAtAltitude(6378000), 0.0); 
+	}
+	
+	@Test
+	public void airDensityAtVostokApogee() {
+		Vostok v = new Vostok(new Vector3d(), new Vector3d(), new Vector3d());
+		Assert.assertEquals(6.824325784991658E-9, v.getAirDensityAtAltitude(6378000 + 215000), 0.0); 
+	}
+	
+	@Test
+	public void timeOfFlight() {
+		Vostok v = new Vostok(new Vector3d(0, 6378000 + 215000, 0), new Vector3d(), new Vector3d(7805, 0, 0));
+		for (int s = 0; s < 24 * 9 * 60 * 60; s++) { // orbit should be stable for 9 days
+			Assert.assertFalse("Second " + s, v.update(1)); 
+		}
+		
+		boolean decayedInTime = false;
+		for (int decayAfterSeconds = 0; decayAfterSeconds < 24 * 2 * 60 * 60; decayAfterSeconds++) { // orbit should decay after 10 days
+			if (v.update(1)) {
+				decayedInTime = true;
+				break;
+			}
+		}
+		
+		Assert.assertTrue("Decay after 10 days ", decayedInTime); 
+	}
+	
+	@Test
+	public void timeIndifferenceOnAngle() {
+		Vostok v = new Vostok(new Vector3d(0, 6378000 + 215000, 0), new Vector3d(), new Vector3d(7700, 0, 0));
+		
+		int secondsToImpactA = 0;
+		while (!v.update(1)) {
+			secondsToImpactA++;
+		}
+		
+		v = new Vostok(new Vector3d(0, 6378000 + 215000, 0), new Vector3d(), new Vector3d(0, 0, 7700));
+		
+		int secondsToImpactB = 0;
+		while (!v.update(1)) {
+			secondsToImpactB++;
+		}
+		
+		Assert.assertEquals(secondsToImpactA, secondsToImpactB, 0);
 	}
 }
