@@ -68,12 +68,12 @@ class Vostok {
 
         double gravity = getVelocityFromForce(getGravitationalForce(massEarth, massVostok, getDistanceToEarthCenter(this.position)), massVostok);
         //System.out.println("g: " + gravity);
-        this.velocity = this.velocity.add(this.getEarthDirection().multiply(gravity));
+        this.velocity = this.velocity.add(this.getEarthDirection().multiply(gravity).multiply(deltaTime));
 
         double orbitDecayDrag = getVelocityFromForce(getDragForce(getAirDensityAtAltitude(getDistanceToEarthCenter(this.position)), dragArea, this.velocity.getLength(), dragCoefficient), massVostok);
         if ((!Double.isNaN(orbitDecayDrag)) && (!Double.isInfinite(orbitDecayDrag)) && (orbitDecayDrag != 0.0)) {
             System.out.println("timestamp " + this.totalTime + "\nheigth: " + getHeightOverEquator() + "\ndensity: "+ getAirDensityAtAltitude(getDistanceToEarthCenter(this.position)) + "\ndrag: " + orbitDecayDrag);
-            this.velocity = this.velocity.subtract(this.velocity.normalize().multiply(orbitDecayDrag));
+            this.velocity = this.velocity.subtract(this.velocity.normalize().multiply(orbitDecayDrag).multiply(deltaTime));
         }
 
         Vector3d deltaVelocity = this.velocity.multiply(deltaTime);
