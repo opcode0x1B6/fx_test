@@ -50,7 +50,13 @@ class Vostok {
     }
 
     public double getAirDensityAtAltitude(double altitudeFromCenterM) {
-        return  Math.min(Math.max((1.0 - Math.pow((altitudeFromCenterM / ( zeroDensityPoint + equatorRadius )), 2)) * densityAirSealevel, 0.0), densityAirSealevel * 2);
+        double altitudeFromEquator = altitudeFromCenterM - equatorRadius;
+        
+        if (altitudeFromEquator < 100) {
+        	return Math.pow(1.3, -altitudeFromEquator / 7000.0 );
+        } else {
+        	return Math.pow(1.3, -altitudeFromEquator / 3000.0 );
+        }
     }
 
     public double getDragForce(double fluidDensityKgM3, double areaM2, double velocity, double dragCoefficient) {
@@ -72,7 +78,7 @@ class Vostok {
 
         double orbitDecayDrag = getVelocityFromForce(getDragForce(getAirDensityAtAltitude(getDistanceToEarthCenter(this.position)), dragArea, this.velocity.getLength(), dragCoefficient), massVostok);
         if ((!Double.isNaN(orbitDecayDrag)) && (!Double.isInfinite(orbitDecayDrag)) && (orbitDecayDrag != 0.0)) {
-            System.out.println("timestamp " + this.totalTime + "\nheigth: " + getHeightOverEquator() + "\ndensity: "+ getAirDensityAtAltitude(getDistanceToEarthCenter(this.position)) + "\ndrag: " + orbitDecayDrag);
+            //System.out.println("timestamp " + this.totalTime + "\nheigth: " + getHeightOverEquator() + "\ndensity: "+ getAirDensityAtAltitude(getDistanceToEarthCenter(this.position)) + "\ndrag: " + orbitDecayDrag);
             this.velocity = this.velocity.subtract(this.velocity.normalize().multiply(orbitDecayDrag).multiply(deltaTime));
         }
 
