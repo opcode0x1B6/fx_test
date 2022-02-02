@@ -76,4 +76,9 @@ class Vector3d {
     public Vector3d normalize() {
         return new Vector3d(divide(getLength()));
     }
+    
+    public Vector3d percentage() {
+    	double total = this.getX() + this.getY() + this.getZ();
+    	return new Vector3d(divide(total));
+    }
 }
