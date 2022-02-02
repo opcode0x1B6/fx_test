@@ -81,4 +81,34 @@ class Vector3d {
     	double total = this.getX() + this.getY() + this.getZ();
     	return new Vector3d(divide(total));
     }
+
+    public Vector3d rotateZ(double rotationRadians) {
+        double sinR = Math.sin(rotationRadians);
+        double cosR = Math.cos(rotationRadians);
+        return new Vector3d(
+            this.getX() * cosR - this.getY() * sinR,
+            this.getX() * sinR + this.getY() * cosR,
+            this.getZ()
+        );
+    }
+
+    public Vector3d rotateY(double rotationRadians) {
+        double sinR = Math.sin(rotationRadians);
+        double cosR = Math.cos(rotationRadians);
+        return new Vector3d(
+            this.getX() * cosR + this.getZ() * sinR,
+            this.getY(),
+            -this.getX() * sinR + this.getZ() * cosR
+        );
+    }
+
+    public Vector3d rotateX(double rotationRadians) {
+        double sinR = Math.sin(rotationRadians);
+        double cosR = Math.cos(rotationRadians);
+        return new Vector3d(
+            this.getX(),
+            this.getY() * cosR - this.getZ() * sinR,
+            this.getY() * sinR + this.getZ() * cosR
+        );
+    }
 }

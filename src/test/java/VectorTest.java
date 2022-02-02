@@ -1,5 +1,7 @@
 package com.opcode.fx_test;
 
+import java.beans.Transient;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -75,5 +77,83 @@ public class VectorTest {
         	Assert.assertEquals(1, vec.getX(), 0.0);
 		Assert.assertEquals(1.5, vec.getY(), 0.0);
 		Assert.assertEquals(2, vec.getZ(), 0.0);
+	}
+
+	@Test
+	public void rotateZ() {
+		Vector3d vec = new Vector3d(0, 1, 0);
+		Vector3d vec90 = vec.rotateZ(Math.PI/2.0);
+		Vector3d vec180 = vec.rotateZ(Math.PI);
+		Vector3d vec180negative = vec.rotateZ(-Math.PI);
+		Vector3d vec45 = vec.rotateZ(Math.PI/4.0);
+
+		Assert.assertEquals(-1.0, vec90.getX(), 0.001);
+		Assert.assertEquals(0.0, vec90.getY(), 0.001);
+		Assert.assertEquals(0.0, vec90.getZ(), 0.001);
+
+		Assert.assertEquals(0.0, vec180.getX(), 0.001);
+		Assert.assertEquals(-1.0, vec180.getY(), 0.001);
+		Assert.assertEquals(0.0, vec180.getZ(), 0.001);
+
+		Assert.assertEquals(0.0, vec180negative.getX(), 0.001);
+		Assert.assertEquals(-1.0, vec180negative.getY(), 0.001);
+		Assert.assertEquals(0.0, vec180negative.getZ(), 0.001);
+
+		// .7 instead of .5 because it is the vector length that counts
+		Assert.assertEquals(-0.7071, vec45.getX(), 0.001);
+		Assert.assertEquals(0.7071, vec45.getY(), 0.001);
+		Assert.assertEquals(0.0, vec45.getZ(), 0.001);
+	}
+
+	@Test
+	public void rotateY() {
+		Vector3d vec = new Vector3d(1, 0, 0);
+		Vector3d vec90 = vec.rotateY(Math.PI/2.0);
+		Vector3d vec180 = vec.rotateY(Math.PI);
+		Vector3d vec180negative = vec.rotateY(-Math.PI);
+		Vector3d vec45 = vec.rotateY(Math.PI/4.0);
+
+		Assert.assertEquals(0.0, vec90.getX(), 0.001);
+		Assert.assertEquals(0.0, vec90.getY(), 0.001);
+		Assert.assertEquals(-1.0, vec90.getZ(), 0.001);
+
+		Assert.assertEquals(-1.0, vec180.getX(), 0.001);
+		Assert.assertEquals(0.0, vec180.getY(), 0.001);
+		Assert.assertEquals(0.0, vec180.getZ(), 0.001);
+
+		Assert.assertEquals(-1.0, vec180negative.getX(), 0.001);
+		Assert.assertEquals(0.0, vec180negative.getY(), 0.001);
+		Assert.assertEquals(0.0, vec180negative.getZ(), 0.001);
+
+		// .7 instead of .5 because it is the vector length that counts
+		Assert.assertEquals(0.7071, vec45.getX(), 0.001);
+		Assert.assertEquals(0.0, vec45.getY(), 0.001);
+		Assert.assertEquals(-0.7071, vec45.getZ(), 0.001);
+	}
+
+	@Test
+	public void rotateX() {
+		Vector3d vec = new Vector3d(0, 1, 0);
+		Vector3d vec90 = vec.rotateX(Math.PI/2.0);
+		Vector3d vec180 = vec.rotateX(Math.PI);
+		Vector3d vec180negative = vec.rotateX(-Math.PI);
+		Vector3d vec45 = vec.rotateX(Math.PI/4.0);
+
+		Assert.assertEquals(0.0, vec90.getX(), 0.001);
+		Assert.assertEquals(0.0, vec90.getY(), 0.001);
+		Assert.assertEquals(1.0, vec90.getZ(), 0.001);
+
+		Assert.assertEquals(0.0, vec180.getX(), 0.001);
+		Assert.assertEquals(-1.0, vec180.getY(), 0.001);
+		Assert.assertEquals(0.0, vec180.getZ(), 0.001);
+
+		Assert.assertEquals(0.0, vec180negative.getX(), 0.001);
+		Assert.assertEquals(-1.0, vec180negative.getY(), 0.001);
+		Assert.assertEquals(0.0, vec180negative.getZ(), 0.001);
+
+		// .7 instead of .5 because it is the vector length that counts
+		Assert.assertEquals(0, vec45.getX(), 0.001);
+		Assert.assertEquals(0.7071, vec45.getY(), 0.001);
+		Assert.assertEquals(0.7071, vec45.getZ(), 0.001);
 	}
 }
