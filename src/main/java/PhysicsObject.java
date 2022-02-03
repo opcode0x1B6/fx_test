@@ -1,16 +1,20 @@
 package com.opcode.fx_test;
 
-abstract class PhysicsObject {
-    private final double GRAVITATIONAL_CONSTANT = 6.67430e-11;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
-    private double mass;
-    private double radius;
+abstract class PhysicsObject {
+    private final BigDecimal GRAVITATIONAL_CONSTANT = new BigDecimal(6.67430e-11);
+
+    private BigDecimal mass;
+    private BigDecimal radius;
     private Vector3d position;
     private Vector3d rotation;
     private Vector3d rotationalVelocity;
     private Vector3d velocity;
 
-    PhysicsObject(double mass, double radius, Vector3d position, Vector3d rotation, Vector3d velocity, Vector3d rotationalVelocity) {
+    PhysicsObject(BigDecimal mass, BigDecimal radius, Vector3d position, Vector3d rotation, Vector3d velocity, Vector3d rotationalVelocity) {
         this.mass = mass;
         this.radius = radius;
         this.position = position;
@@ -22,28 +26,28 @@ abstract class PhysicsObject {
     public boolean equals(Object o) {
         if (o instanceof PhysicsObject) {
             PhysicsObject op = (PhysicsObject)o;
-            return ((op.getMass() == getMass()) && (op.getRadius() == getRadius()) && (op.getPosition().equals(getPosition())));
+            return ((op.getMass().equals(getMass())) && (op.getRadius().equals(getRadius())) && (op.getPosition().equals(getPosition())));
         }
         return false;
     }
 
-    double getMass() {
+    BigDecimal getMass() {
         return mass;
     }
 
-    double getRadius() {
+    BigDecimal getRadius() {
         return radius;
     }
 
-    double getDragArea() {
+    BigDecimal getDragArea() {
         // default implementation this is a circle
-        return getRadius() * getRadius() * Math.PI;
+        return getRadius().pow(2).multiply(new BigDecimal(Math.PI));
     }
 
-    double getDragCoefficient() {
+    BigDecimal getDragCoefficient() {
         // default implementation this is a sphere
         // see https://en.wikipedia.org/wiki/Drag_coefficient
-        return 0.47;
+        return new BigDecimal(0.47);
     }
 
     Vector3d getPosition() {
@@ -62,43 +66,43 @@ abstract class PhysicsObject {
         return velocity;
     }
 
-    private double forceToAcceleration(double force) {
+    private BigDecimal forceToAcceleration(BigDecimal force) {
         // a = F/m
-        return force / getMass();
+        return force.divide(getMass(), MathContext.DECIMAL128);
     }
 
     Vector3d getDistanceVector(PhysicsObject partner) {
         return partner.getPosition().subtract(getPosition());
     }
 
-    double getAltitudeOverEquator(PhysicsObject partner) {
-        return getDistanceVector(partner).getLength() - partner.getRadius();
+    BigDecimal getAltitudeOverEquator(PhysicsObject partner) {
+        return getDistanceVector(partner).getLength().subtract(partner.getRadius());
     }
 
-    void addGravity(PhysicsObject partner, double deltaTime) {
+    void addGravity(PhysicsObject partner, BigDecimal deltaTime) {
         // get distance and direction of force
         Vector3d distanceVector = getDistanceVector(partner);
-        double distance = distanceVector.getLength();
+        BigDecimal distance = distanceVector.getLength();
         Vector3d directionVector = distanceVector.normalize();
 
         // calculate force F = G*m1*m2/d² and convert to acceleration a = F/m1
-        double gravityForce = (GRAVITATIONAL_CONSTANT * getMass() * partner.getMass()) / (distance * distance);
-        double gravityAcceleration = forceToAcceleration(gravityForce);
+        BigDecimal gravityForce = GRAVITATIONAL_CONSTANT.multiply(getMass()).multiply(partner.getMass()).divide(distance.pow(2), MathContext.DECIMAL128);
+        BigDecimal gravityAcceleration = forceToAcceleration(gravityForce);
 
         // add the acceleration in the direction times the time since last update
         velocity = velocity.add(directionVector.multiply(gravityAcceleration).multiply(deltaTime));
     }
 
-    void addDrag(Planetoid planetoid, double deltaTime) {
+    void addDrag(Planetoid planetoid, BigDecimal deltaTime) {
         // get distance
         Vector3d distanceVector = getDistanceVector((PhysicsObject)planetoid);
-        double distance = distanceVector.getLength();
+        BigDecimal distance = distanceVector.getLength();
 
-        double fluidDensity = planetoid.getAtmosphereDensity(distance);
-        if (fluidDensity > 0) {
+        BigDecimal fluidDensity = planetoid.getAtmosphereDensity(distance);
+        if (fluidDensity.doubleValue() > 0) {
             // calculate drag force 
-            double dragForce = 0.5 * getDragCoefficient() * fluidDensity * getDragArea() * (getVelocity().getLength() * getVelocity().getLength());
-            double dragAcceleration = forceToAcceleration(dragForce);
+            BigDecimal dragForce = new BigDecimal(0.5).multiply(getDragCoefficient()).multiply(fluidDensity).multiply(getDragArea()).multiply(getVelocity().getLength().pow(2));
+            BigDecimal dragAcceleration = forceToAcceleration(dragForce);
 
             // get reverse of our current velocity
             Vector3d reverseVelocity = new Vector3d().subtract(getVelocity()).normalize();
@@ -108,7 +112,7 @@ abstract class PhysicsObject {
         }
     }
 
-    void update(double deltaTime) {
+    void update(BigDecimal deltaTime) {
         position = position.add(velocity.multiply(deltaTime));
         rotation = rotation.add(rotationalVelocity.multiply(deltaTime));
     }
