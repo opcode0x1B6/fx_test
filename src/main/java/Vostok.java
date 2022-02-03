@@ -8,7 +8,9 @@ import java.util.concurrent.locks.ReentrantLock;
 class Vostok extends Thread {
     Vector3d position;
     Vector3d heading;
+
     Vector3d velocity;
+    Vector3d rotationalVelocity;
 
     double totalTime;
 
@@ -16,6 +18,11 @@ class Vostok extends Thread {
     boolean mainRocketIgnited = false;
     double deltaVStorage = 155;
     double deltaVSecond = 1.55;
+
+    // not a real rcs but works for the moment
+    double rcsFuelStorage = 20;
+    double rcsFuelPerSecond = 0.1;
+    double rcsRotationPerSecond = Math.PI/1000.0;
 
     Lock modificationLock;
 
@@ -54,6 +61,7 @@ class Vostok extends Thread {
         this.position = position;
         this.heading = heading;
         this.velocity = velocity;
+        this.rotationalVelocity = new Vector3d();
         this.totalTime = 0;
         modificationLock = new ReentrantLock();
     }
@@ -129,7 +137,7 @@ class Vostok extends Thread {
                     burnTime = deltaVStorage / deltaVSecond;
                     deltaVStorage = 0;
                 }
-                System.out.println("main rocket burn: " + burnTime);
+                //System.out.println("main rocket burn: " + burnTime);
                 this.velocity = this.velocity.add(this.heading.normalize().multiply(deltaVSecond).multiply(burnTime));
             }
         }
@@ -137,8 +145,8 @@ class Vostok extends Thread {
         Vector3d deltaVelocity = this.velocity.multiply(deltaTime);
         this.position = this.position.add(deltaVelocity);
 
-        System.out.println("timestamp: " + this.totalTime);
-        System.out.println("pos " + this.position.getX() + " " + this.position.getY() + " " + this.position.getZ());
+        //System.out.println("timestamp: " + this.totalTime);
+        //System.out.println("pos " + this.position.getX() + " " + this.position.getY() + " " + this.position.getZ());
 
         this.modificationLock.unlock();
 

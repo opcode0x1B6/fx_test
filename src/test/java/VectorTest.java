@@ -8,6 +8,33 @@ import org.junit.Test;
 public class VectorTest {
 
 	@Test
+	public void equalTest() {
+		Vector3d vec1 = new Vector3d(0.0, 1.0, 2.0);
+		Vector3d vec2 = new Vector3d(0.0, 1.0, 2.0);
+
+		Assert.assertTrue("Equal vector check", vec1.equals(vec2));
+		Assert.assertTrue("Equal vector check", vec2.equals(vec1));
+	}
+
+	@Test
+	public void unequalTest() {
+		Vector3d vec1 = new Vector3d(0.0, 1.0, 2.0);
+		Vector3d vec2 = new Vector3d(1.0, 1.0, 2.0);
+
+		Assert.assertFalse("Unequal vector check", vec1.equals(vec2));
+		Assert.assertFalse("Unequal vector check", vec2.equals(vec1));
+	}
+
+	@Test
+	public void unequalPercisionTest() {
+		Vector3d vec1 = new Vector3d(0.0, 1.0, 2.0);
+		Vector3d vec2 = new Vector3d(0.0, 0.999999, 2.0);
+
+		Assert.assertFalse("Unequal percision vector check", vec1.equals(vec2));
+		Assert.assertFalse("Unequal percision vector check", vec2.equals(vec1));
+	}
+
+	@Test
 	public void percentage() {
 		Vector3d vec = new Vector3d(1, 2, 3);
 		vec = vec.percentage();

@@ -8,6 +8,14 @@ class Vector3d {
     private double z;
     private double length;
 
+    public boolean equals(Object o) {
+        if (o instanceof Vector3d) {
+            Vector3d ov = (Vector3d)o;
+            return ((ov.getX() == this.getX()) && (ov.getY() == this.getY()) && (ov.getZ() == this.getZ()));
+        }
+        return false;
+    }
+
     public double getX() {
         return this.x;
     }
