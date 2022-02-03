@@ -70,4 +70,48 @@ public class PhysicsTest {
         Assert.assertEquals(5e-10, earth.getAtmosphereDensity(earthRadius + 180e3), 0.0001);
         Assert.assertEquals(0.0, earth.getAtmosphereDensity(earthRadius + 300e3), 0.0);
     }
+
+    @Test
+    public void orbitStabilityWithDragTest() {
+        double earthRadius = 6371e3;
+        PhysicsObject earth = new Planetoid(5.972e24, earthRadius, new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), 300000.0, 8000.0, 1.285, 2.6);
+        PhysicsObject vostok = new Spacecraft(4700, 2, new Vector3d(earthRadius + 215e3, 0, 0), new Vector3d(), new Vector3d(0, 7768, 0), new Vector3d());
+
+        PhysicsSimulator sim = new PhysicsSimulator();
+        sim.addObject(earth);
+        sim.addObject(vostok);
+
+        double lowestPosition = 500e3;
+        double highestPosition = 100e3;
+        int secondsToDecay = 0;
+
+        // orbit has to be stable for at least 8 days
+        for (int i = 0; i < 8 * 24 * 60 * 60; i++) {
+            sim.update(1.0);
+            Assert.assertTrue("Orbit stable lower bounds iteration " + i, vostok.getAltitudeOverEquator(earth) > 100e3);
+            Assert.assertTrue("Orbit stable upper bounds iteration " + i, vostok.getAltitudeOverEquator(earth) < + 500e3);
+
+            if (highestPosition < vostok.getAltitudeOverEquator(earth)) {
+                highestPosition = vostok.getAltitudeOverEquator(earth);
+            }
+            if (lowestPosition > vostok.getAltitudeOverEquator(earth)) {
+                lowestPosition = vostok.getAltitudeOverEquator(earth);
+            }
+
+            secondsToDecay++;
+        }
+
+        // orbit should decay after 10 days
+        boolean orbitDecayed = false;
+        for (int i = 0; i < 3 * 24 * 60 * 60; i++) {
+            sim.update(1.0);
+            if (vostok.getPosition().getLength() < earthRadius) {
+                orbitDecayed = true;
+                break;
+            }
+            secondsToDecay++;
+        }
+        Assert.assertTrue("Orbit decay in timeframe ", orbitDecayed);
+        System.out.println("Deorbit in " + secondsToDecay/60/60 + " hours" + "\nOrbit apoapsis " + (int)(highestPosition/1000) + " km periapsis " + (int)(lowestPosition/1000) + " km");
+    }
 }

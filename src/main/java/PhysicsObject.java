@@ -35,6 +35,17 @@ abstract class PhysicsObject {
         return radius;
     }
 
+    double getDragArea() {
+        // default implementation this is a circle
+        return getRadius() * getRadius() * Math.PI;
+    }
+
+    double getDragCoefficient() {
+        // default implementation this is a sphere
+        // see https://en.wikipedia.org/wiki/Drag_coefficient
+        return 0.47;
+    }
+
     Vector3d getPosition() {
         return position;
     }
@@ -56,9 +67,17 @@ abstract class PhysicsObject {
         return force / getMass();
     }
 
+    Vector3d getDistanceVector(PhysicsObject partner) {
+        return partner.getPosition().subtract(getPosition());
+    }
+
+    double getAltitudeOverEquator(PhysicsObject partner) {
+        return getDistanceVector(partner).getLength() - partner.getRadius();
+    }
+
     void addGravity(PhysicsObject partner, double deltaTime) {
         // get distance and direction of force
-        Vector3d distanceVector = partner.getPosition().subtract(getPosition());
+        Vector3d distanceVector = getDistanceVector(partner);
         double distance = distanceVector.getLength();
         Vector3d directionVector = distanceVector.normalize();
 
@@ -68,6 +87,25 @@ abstract class PhysicsObject {
 
         // add the acceleration in the direction times the time since last update
         velocity = velocity.add(directionVector.multiply(gravityAcceleration).multiply(deltaTime));
+    }
+
+    void addDrag(Planetoid planetoid, double deltaTime) {
+        // get distance
+        Vector3d distanceVector = getDistanceVector((PhysicsObject)planetoid);
+        double distance = distanceVector.getLength();
+
+        double fluidDensity = planetoid.getAtmosphereDensity(distance);
+        if (fluidDensity > 0) {
+            // calculate drag force 
+            double dragForce = 0.5 * getDragCoefficient() * fluidDensity * getDragArea() * (getVelocity().getLength() * getVelocity().getLength());
+            double dragAcceleration = forceToAcceleration(dragForce);
+
+            // get reverse of our current velocity
+            Vector3d reverseVelocity = new Vector3d().subtract(getVelocity()).normalize();
+
+            // add the acceleration
+            velocity = velocity.add(reverseVelocity.multiply(dragAcceleration).multiply(deltaTime)); // multiplying the slowdown with deltaTime will cause problems on greater deltas
+        }
     }
 
     void update(double deltaTime) {

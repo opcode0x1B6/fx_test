@@ -38,11 +38,14 @@ class PhysicsSimulator extends Thread {
     }
 
     public void update(double deltaTime) {
-        // calculate gravity for each partner
+        // calculate gravity and drag for each partner
         for (PhysicsObject body: bodies) {
             for (PhysicsObject partner: bodies) {
                 if (!partner.equals(body)) {
                     body.addGravity(partner, deltaTime);
+                    if (partner instanceof Planetoid) {
+                        body.addDrag((Planetoid)partner, deltaTime);
+                    }   
                 }
             }
         }
