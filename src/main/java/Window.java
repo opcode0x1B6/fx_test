@@ -30,7 +30,7 @@ public class Window extends Application {
     MediaPlayer mediaPlayer;
     
     TripleMeter meter;
-	Vostok vostok;
+	
 
     public void onButtonClick(MouseEvent e) {
     	ImageButton clickedButton = (ImageButton)e.getSource();
@@ -41,7 +41,7 @@ public class Window extends Application {
     		clickedButton.setImage(this.img_btn_on);
     		this.meter.mapTopValue(100);
 			if (clickedButton.getId().equals("imgButton2")) { // beware the id is without hashtag
-				this.vostok.igniteMainRocket();
+
 			}
     	}
     	else {
@@ -53,9 +53,6 @@ public class Window extends Application {
     
     @Override
     public void start(Stage primaryStage) {
-    
-		vostok = new Vostok(new Vector3d(0, 6378000 + 215000, 0), new Vector3d(-1, 0, 0), new Vector3d(7805, 0, 0));
-		vostok.start();
 
     	this.img_btn_off = new Image(new File("res/button_off.png").toURI().toString());
     	this.img_btn_on = new Image(new File("res/button_on.png").toURI().toString());

@@ -74,10 +74,12 @@ public class PhysicsTest {
     @Test
     public void orbitStabilityWithDragTest() {
         double earthRadius = 6371e3;
-        PhysicsObject earth = new Planetoid(5.972e24, earthRadius, new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), 300000.0, 8000.0, 1.285, 2.6);
-        PhysicsObject vostok = new Spacecraft(4700, 2, new Vector3d(earthRadius + 215e3, 0, 0), new Vector3d(), new Vector3d(0, 7768, 0), new Vector3d());
+        PhysicsObject sun = new Sun();
+        PhysicsObject earth = new Earth(sun);
+        PhysicsObject vostok = new Vostok(earth);
 
         PhysicsSimulator sim = new PhysicsSimulator();
+        sim.addObject(sun);
         sim.addObject(earth);
         sim.addObject(vostok);
 
@@ -85,11 +87,15 @@ public class PhysicsTest {
         double highestPosition = 100e3;
         int secondsToDecay = 0;
 
-        // orbit has to be stable for at least 8 days
-        for (int i = 0; i < 8 * 24 * 60 * 60; i++) { 
+        //System.out.println(vostok.getVelocity().getLength());
+        //System.out.println(vostok.getPosition().getLength() + " " + earth.getPosition().getLength() + " " + (earth.getPosition().getLength() - vostok.getPosition().getLength()) + " a " + vostok.getAltitudeOverEquator(earth));
+
+        // orbit has to be stable for at least 7 days
+        for (int i = 0; i < 7 * 24 * 60 * 60; i++) { 
             sim.update(1.0);
-            Assert.assertTrue("Orbit stable lower bounds iteration " + i, vostok.getAltitudeOverEquator(earth) > 100e3);
-            Assert.assertTrue("Orbit stable upper bounds iteration " + i, vostok.getAltitudeOverEquator(earth) < + 500e3);
+            //System.out.println(vostok.getPosition().getLength() + " " + earth.getPosition().getLength() + " " + (earth.getPosition().getLength() - vostok.getPosition().getLength()));
+            Assert.assertTrue("Orbit stable lower bounds iteration " + i, vostok.getAltitudeOverEquator(earth) > 10e3);
+            Assert.assertTrue("Orbit stable upper bounds iteration " + i, vostok.getAltitudeOverEquator(earth) < 700e3);
 
             if (highestPosition < vostok.getAltitudeOverEquator(earth)) {
                 highestPosition = vostok.getAltitudeOverEquator(earth);
@@ -101,18 +107,18 @@ public class PhysicsTest {
             secondsToDecay++;
         }
 
-        // orbit should decay after 10 days
+        // orbit should decay after 12 days
         boolean orbitDecayed = false;
-        for (int i = 0; i < 3 * 24 * 60 * 60; i++) {
+        for (int i = 0; i < 30 * 24 * 60 * 60; i++) {
             sim.update(1.0);
-            if (vostok.getPosition().getLength() < earthRadius) {
+            if (vostok.getAltitudeOverEquator(earth) < 1000) {
                 orbitDecayed = true;
                 break;
             }
             secondsToDecay++;
         }
-        Assert.assertTrue("Orbit decay in timeframe ", orbitDecayed);
         System.out.println("Deorbit in " + secondsToDecay/60/60 + " hours" + "\nOrbit apoapsis " + (int)(highestPosition/1000) + " km periapsis " + (int)(lowestPosition/1000) + " km");
+        Assert.assertTrue("Orbit decay in timeframe ", orbitDecayed);
     }
 
     @Test

@@ -8,6 +8,14 @@ class Planetoid extends PhysicsObject {
     private double atmosphereDensityAtSealevel;
     private double atmosphereBasis;
 
+    Planetoid(PhysicsObject parent, double mass, double radius, Vector3d position, Vector3d rotation, Vector3d velocity, Vector3d rotationalVelocity, double atmosphereCutoffRadius, double atmosphereCondensedRadius, double atmosphereDensityAtSealevel, double atmosphereBasis) {
+        super(mass, radius, parent.getPosition().add(position), rotation, parent.getVelocity().add(velocity), rotationalVelocity);
+        this.atmosphereCutoffRadius = atmosphereCutoffRadius;
+        this.atmosphereCondensedRadius = atmosphereCondensedRadius;
+        this.atmosphereDensityAtSealevel = atmosphereDensityAtSealevel;
+        this.atmosphereBasis = atmosphereBasis;
+    }
+
     Planetoid(double mass, double radius, Vector3d position, Vector3d rotation, Vector3d velocity, Vector3d rotationalVelocity, double atmosphereCutoffRadius, double atmosphereCondensedRadius, double atmosphereDensityAtSealevel, double atmosphereBasis) {
         super(mass, radius, position, rotation, velocity, rotationalVelocity);
         this.atmosphereCutoffRadius = atmosphereCutoffRadius;

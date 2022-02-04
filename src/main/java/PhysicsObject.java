@@ -10,6 +10,10 @@ abstract class PhysicsObject {
     private Vector3d rotationalVelocity;
     private Vector3d velocity;
 
+    protected void setPosition(Vector3d position) {
+        this.position = position;
+    }
+
     PhysicsObject(double mass, double radius, Vector3d position, Vector3d rotation, Vector3d velocity, Vector3d rotationalVelocity) {
         this.mass = mass;
         this.radius = radius;
@@ -83,12 +87,19 @@ abstract class PhysicsObject {
 
         // calculate force F = G*m1*m2/d² and convert to acceleration a = F/m1
         double gravityForce = (GRAVITATIONAL_CONSTANT * getMass() * partner.getMass()) / (distance * distance);
-        assert gravityForce != Double.NaN;
+        //assert gravityForce != Double.NaN;
         double gravityAcceleration = forceToAcceleration(gravityForce);
-        assert gravityAcceleration != Double.NaN;
+        //assert gravityAcceleration != Double.NaN;
 
         // add the acceleration in the direction times the time since last update
         velocity = velocity.add(directionVector.multiply(gravityAcceleration).multiply(deltaTime));
+    }
+
+    double calculateDragForAxis(double fluidDensity, double velocity) {
+        // calculate drag force 
+        double dragForce = 0.5 * getDragCoefficient() * fluidDensity * getDragArea() * (velocity * velocity);
+        //assert dragForce != Double.NaN;
+        return forceToAcceleration(dragForce);
     }
 
     void addDrag(Planetoid planetoid, double deltaTime) {
@@ -98,16 +109,11 @@ abstract class PhysicsObject {
 
         double fluidDensity = planetoid.getAtmosphereDensity(distance);
         if (fluidDensity > 0) {
-            // calculate drag force 
-            double dragForce = 0.5 * getDragCoefficient() * fluidDensity * getDragArea() * (getVelocity().getLength() * getVelocity().getLength());
-            assert dragForce != Double.NaN;
-            double dragAcceleration = forceToAcceleration(dragForce);
-
-            // get reverse of our current velocity
-            Vector3d reverseVelocity = new Vector3d().subtract(getVelocity()).normalize();
-
-            // add the acceleration
-            velocity = velocity.add(reverseVelocity.multiply(dragAcceleration).multiply(deltaTime)); // multiplying the slowdown with deltaTime will cause problems on greater deltas
+            velocity.subtract(new Vector3d(
+                calculateDragForAxis(fluidDensity, velocity.getX()),
+                calculateDragForAxis(fluidDensity, velocity.getY()),
+                calculateDragForAxis(fluidDensity, velocity.getZ())
+            ).multiply(deltaTime));
         }
     }
 
