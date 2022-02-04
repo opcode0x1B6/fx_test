@@ -1,0 +1,100 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.opcode.fx_test:fx_test >---------------------
+[INFO] Building fx_test 0.1
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ fx_test ---
+[INFO] Deleting /home/opcode/Documents/java/fx_test/target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:copy-resources (copy-resources) @ fx_test ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 12 resources
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ fx_test ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/opcode/Documents/java/fx_test/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ fx_test ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 14 source files to /home/opcode/Documents/java/fx_test/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ fx_test ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/opcode/Documents/java/fx_test/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ fx_test ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 2 source files to /home/opcode/Documents/java/fx_test/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.22.2:test (default-test) @ fx_test ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.opcode.fx_test.PhysicsTest
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.018 s <<< FAILURE! - in com.opcode.fx_test.PhysicsTest
+[ERROR] earthMoonTest(com.opcode.fx_test.PhysicsTest)  Time elapsed: 0.005 s  <<< ERROR!
+java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
+	at com.opcode.fx_test.PhysicsTest.earthMoonTest(PhysicsTest.java:134)
+
+[INFO] Running com.opcode.fx_test.VectorTest
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+WARNING double conversion for Vector3d used
+[ERROR] Tests run: 13, Failures: 1, Errors: 1, Skipped: 0, Time elapsed: 0.005 s <<< FAILURE! - in com.opcode.fx_test.VectorTest
+[ERROR] normalize(com.opcode.fx_test.VectorTest)  Time elapsed: 0 s  <<< ERROR!
+java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
+	at com.opcode.fx_test.VectorTest.normalize(VectorTest.java:42)
+
+[ERROR] equalTest(com.opcode.fx_test.VectorTest)  Time elapsed: 0.001 s  <<< FAILURE!
+java.lang.AssertionError: Equal vector check
+	at com.opcode.fx_test.VectorTest.equalTest(VectorTest.java:17)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   VectorTest.equalTest:17 Equal vector check
+[ERROR] Errors: 
+[ERROR]   PhysicsTest.earthMoonTest:134 » Arithmetic Non-terminating decimal expansion; ...
+[ERROR]   VectorTest.normalize:42 » Arithmetic Non-terminating decimal expansion; no exa...
+[INFO] 
+[ERROR] Tests run: 14, Failures: 1, Errors: 2, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.595 s
+[INFO] Finished at: 2022-02-03T22:12:16+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:2.22.2:test (default-test) on project fx_test: There are test failures.
+[ERROR] 
+[ERROR] Please refer to /home/opcode/Documents/java/fx_test/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
