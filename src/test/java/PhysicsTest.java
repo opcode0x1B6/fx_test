@@ -86,7 +86,7 @@ public class PhysicsTest {
         int secondsToDecay = 0;
 
         // orbit has to be stable for at least 8 days
-        for (int i = 0; i < 8 * 24 * 60 * 60; i++) {
+        for (int i = 0; i < 8 * 24 * 60 * 60; i++) { 
             sim.update(1.0);
             Assert.assertTrue("Orbit stable lower bounds iteration " + i, vostok.getAltitudeOverEquator(earth) > 100e3);
             Assert.assertTrue("Orbit stable upper bounds iteration " + i, vostok.getAltitudeOverEquator(earth) < + 500e3);
@@ -113,5 +113,34 @@ public class PhysicsTest {
         }
         Assert.assertTrue("Orbit decay in timeframe ", orbitDecayed);
         System.out.println("Deorbit in " + secondsToDecay/60/60 + " hours" + "\nOrbit apoapsis " + (int)(highestPosition/1000) + " km periapsis " + (int)(lowestPosition/1000) + " km");
+    }
+
+    @Test
+    public void moonOrbitTest() {
+        PhysicsObject sun = new Sun();
+        PhysicsObject earth = new Earth(sun);
+        PhysicsObject moon = new Moon(earth);
+
+        PhysicsSimulator sim = new PhysicsSimulator();
+        sim.addObject(earth);
+        sim.addObject(moon);
+        sim.addObject(sun);
+
+        for (int i = 0; i < 357 * 24 * 60 * 60; i++) { 
+            sim.update(1.0);
+
+            Assert.assertTrue("Orbit stable ", moon.getAltitudeOverEquator(earth) > 350000e3);
+            Assert.assertTrue("Orbit stable ", moon.getAltitudeOverEquator(earth) < 450000e3);
+
+            Assert.assertTrue("Orbit stable ", earth.getAltitudeOverEquator(sun) > 130e9);
+            Assert.assertTrue("Orbit stable ", earth.getAltitudeOverEquator(sun) < 170e9);
+
+            if (i % (60 * 60 * 24 * 30) == 0) {
+                System.out.println("Month " + (i / (60 * 60 * 24 * 30) + 1));
+                System.out.println("Moon over earth " + moon.getAltitudeOverEquator(earth));
+                System.out.println("Earth over sun " + earth.getAltitudeOverEquator(sun));
+                System.out.println("Moon over sun " + moon.getAltitudeOverEquator(sun));
+            }
+        }
     }
 }

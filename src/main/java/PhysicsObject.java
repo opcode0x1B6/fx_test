@@ -83,7 +83,9 @@ abstract class PhysicsObject {
 
         // calculate force F = G*m1*m2/d² and convert to acceleration a = F/m1
         double gravityForce = (GRAVITATIONAL_CONSTANT * getMass() * partner.getMass()) / (distance * distance);
+        assert gravityForce != Double.NaN;
         double gravityAcceleration = forceToAcceleration(gravityForce);
+        assert gravityAcceleration != Double.NaN;
 
         // add the acceleration in the direction times the time since last update
         velocity = velocity.add(directionVector.multiply(gravityAcceleration).multiply(deltaTime));
@@ -98,6 +100,7 @@ abstract class PhysicsObject {
         if (fluidDensity > 0) {
             // calculate drag force 
             double dragForce = 0.5 * getDragCoefficient() * fluidDensity * getDragArea() * (getVelocity().getLength() * getVelocity().getLength());
+            assert dragForce != Double.NaN;
             double dragAcceleration = forceToAcceleration(dragForce);
 
             // get reverse of our current velocity
