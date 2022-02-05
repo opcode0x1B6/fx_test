@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class VectorTest {
+	/* All tests around the Vector3d class */
 
 	@Test
 	public void equalTest() {

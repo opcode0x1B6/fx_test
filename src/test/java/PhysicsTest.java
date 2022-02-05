@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class PhysicsTest {
+    /* Physics test without simulator to check if basic numbers match */
 
 	@Test
 	public void equalTest() {
@@ -26,127 +27,45 @@ public class PhysicsTest {
 	}
 
     @Test
-    public void gravityAccelerationTest() {
-        double earthRadius = 6371e3;
-        PhysicsObject earth = new Planetoid(5.972e24, earthRadius, new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), 0, 0, 0, 0);
-        PhysicsObject vostok = new Spacecraft(4700, 2, new Vector3d(earthRadius, 0, 0), new Vector3d(), new Vector3d(), new Vector3d());
+    public void gravityTest() {
+        PhysicsObject earth = new Earth();
+        PhysicsObject vostok = new Spacecraft(4700, 2, new Vector3d(earth.getRadius(), 0, 0), new Vector3d(), new Vector3d(), new Vector3d());
 
-        PhysicsSimulator sim = new PhysicsSimulator();
-        sim.addObject(earth);
-        sim.addObject(vostok);
-        sim.update(1.0);
+        // newtons of force for both partners the same
+        Assert.assertEquals(46153.875, earth.getGravitationForce(vostok.getMass(), earth.getRadius()), 0.001);
+        Assert.assertEquals(46153.875, vostok.getGravitationForce(earth.getMass(), earth.getRadius()), 0.001);
 
-        Assert.assertEquals(9.81, vostok.getVelocity().getLength(), 0.02);
-    }
-
-    @Test
-    public void orbitStabilityTest() {
-        double earthRadius = 6371e3;
-        PhysicsObject earth = new Planetoid(5.972e24, earthRadius, new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), 0, 0, 0, 0);
-        PhysicsObject vostok = new Spacecraft(4700, 2, new Vector3d(earthRadius + 215e3, 0, 0), new Vector3d(), new Vector3d(0, 7850, 0), new Vector3d());
-
-        PhysicsSimulator sim = new PhysicsSimulator();
-        sim.addObject(earth);
-        sim.addObject(vostok);
-
-        // orbit has to be stable for at least 8 days
-        for (int i = 0; i < 8 * 24 * 60 * 60; i++) {
-            sim.update(1.0);
-            Assert.assertTrue("Orbit stable lower bounds iteration " + i, vostok.getPosition().getLength() > earthRadius + 200e3);
-            Assert.assertTrue("Orbit stable upper bounds iteration " + i, vostok.getPosition().getLength() < earthRadius + 500e3);
-        }
+        // acceleration quite different
+        Assert.assertEquals(9.81, vostok.forceToAcceleration(vostok.getGravitationForce(earth.getMass(), earth.getRadius())), 0.02);
+        Assert.assertEquals(7e-21, earth.forceToAcceleration(earth.getGravitationForce(vostok.getMass(), earth.getRadius())), 0.0001);
     }
 
     @Test
     public void atmosphereTest() {
         // because we only do an approximation we have high tolerances here
-        double earthRadius = 6371e3;
-        Planetoid earth = new Planetoid(5.972e24, earthRadius, new Vector3d(), new Vector3d(), new Vector3d(), new Vector3d(), 300000.0, 8000.0, 1.285, 2.6);
+        Planetoid earth = new Earth();
 
-        Assert.assertEquals(1.285, earth.getAtmosphereDensity(earthRadius), 0.001);
-        Assert.assertEquals(0.4, earth.getAtmosphereDensity(earthRadius + 10e3), 0.1);
-        Assert.assertEquals(0.09, earth.getAtmosphereDensity(earthRadius + 20e3), 0.2);
-        Assert.assertEquals(5e-7, earth.getAtmosphereDensity(earthRadius + 100e3), 0.0001);
-        Assert.assertEquals(5e-10, earth.getAtmosphereDensity(earthRadius + 180e3), 0.0001);
-        Assert.assertEquals(0.0, earth.getAtmosphereDensity(earthRadius + 300e3), 0.0);
+        Assert.assertEquals(1.285, earth.getAtmosphereDensity(earth.getRadius()), 0.001);
+        Assert.assertEquals(0.4, earth.getAtmosphereDensity(earth.getRadius() + 10e3), 0.1);
+        Assert.assertEquals(0.09, earth.getAtmosphereDensity(earth.getRadius() + 20e3), 0.2);
+        Assert.assertEquals(5e-7, earth.getAtmosphereDensity(earth.getRadius() + 100e3), 0.0001);
+        Assert.assertEquals(5e-10, earth.getAtmosphereDensity(earth.getRadius() + 180e3), 0.0001);
+        Assert.assertEquals(9e-12, earth.getAtmosphereDensity(earth.getRadius() + 215e3), 0.0001);
+        Assert.assertEquals(0.0, earth.getAtmosphereDensity(earth.getRadius() + 300e3), 0.0);
     }
 
     @Test
-    public void orbitStabilityWithDragTest() {
-        double earthRadius = 6371e3;
-        PhysicsObject sun = new Sun();
-        PhysicsObject earth = new Earth(sun);
-        PhysicsObject vostok = new Vostok(earth);
+    public void dragTest() {
+        Planetoid earth = new Earth();
+        PhysicsObject vostokCapsule = new Spacecraft(4700, 2, new Vector3d(earth.getRadius(), 0, 0), new Vector3d(), new Vector3d(), new Vector3d());
+        PhysicsObject vostokFull = new Vostok(earth);
+        vostokFull.setPosition(new Vector3d(earth.getRadius(), 0, 0));
 
-        PhysicsSimulator sim = new PhysicsSimulator();
-        sim.addObject(sun);
-        sim.addObject(earth);
-        sim.addObject(vostok);
+        Assert.assertEquals(15.1789, vostokCapsule.calculateDragForce(earth.getAtmosphereDensity(earth.getRadius()), 2), 0.001);
+        Assert.assertEquals(0.0032, vostokCapsule.forceToAcceleration(vostokCapsule.calculateDragForce(earth.getAtmosphereDensity(earth.getRadius()), 2)), 0.001);
 
-        double lowestPosition = 500e3;
-        double highestPosition = 100e3;
-        int secondsToDecay = 0;
-
-        //System.out.println(vostok.getVelocity().getLength());
-        //System.out.println(vostok.getPosition().getLength() + " " + earth.getPosition().getLength() + " " + (earth.getPosition().getLength() - vostok.getPosition().getLength()) + " a " + vostok.getAltitudeOverEquator(earth));
-
-        // orbit has to be stable for at least 7 days
-        for (int i = 0; i < 7 * 24 * 60 * 60; i++) { 
-            sim.update(1.0);
-            //System.out.println(vostok.getPosition().getLength() + " " + earth.getPosition().getLength() + " " + (earth.getPosition().getLength() - vostok.getPosition().getLength()));
-            Assert.assertTrue("Orbit stable lower bounds iteration " + i, vostok.getAltitudeOverEquator(earth) > 10e3);
-            Assert.assertTrue("Orbit stable upper bounds iteration " + i, vostok.getAltitudeOverEquator(earth) < 700e3);
-
-            if (highestPosition < vostok.getAltitudeOverEquator(earth)) {
-                highestPosition = vostok.getAltitudeOverEquator(earth);
-            }
-            if (lowestPosition > vostok.getAltitudeOverEquator(earth)) {
-                lowestPosition = vostok.getAltitudeOverEquator(earth);
-            }
-
-            secondsToDecay++;
-        }
-
-        // orbit should decay after 12 days
-        boolean orbitDecayed = false;
-        for (int i = 0; i < 30 * 24 * 60 * 60; i++) {
-            sim.update(1.0);
-            if (vostok.getAltitudeOverEquator(earth) < 1000) {
-                orbitDecayed = true;
-                break;
-            }
-            secondsToDecay++;
-        }
-        System.out.println("Deorbit in " + secondsToDecay/60/60 + " hours" + "\nOrbit apoapsis " + (int)(highestPosition/1000) + " km periapsis " + (int)(lowestPosition/1000) + " km");
-        Assert.assertTrue("Orbit decay in timeframe ", orbitDecayed);
+        // full vostok has a dragCoefficient of 0.87 and an area of 28.274333882 m²
+        Assert.assertEquals(59.5853, vostokFull.calculateDragForce(earth.getAtmosphereDensity(earth.getRadius()), 2), 0.001);
     }
-
-    @Test
-    public void moonOrbitTest() {
-        PhysicsObject sun = new Sun();
-        PhysicsObject earth = new Earth(sun);
-        PhysicsObject moon = new Moon(earth);
-
-        PhysicsSimulator sim = new PhysicsSimulator();
-        sim.addObject(earth);
-        sim.addObject(moon);
-        sim.addObject(sun);
-
-        for (int i = 0; i < 357 * 24 * 60 * 60; i++) { 
-            sim.update(1.0);
-
-            Assert.assertTrue("Orbit stable ", moon.getAltitudeOverEquator(earth) > 350000e3);
-            Assert.assertTrue("Orbit stable ", moon.getAltitudeOverEquator(earth) < 450000e3);
-
-            Assert.assertTrue("Orbit stable ", earth.getAltitudeOverEquator(sun) > 130e9);
-            Assert.assertTrue("Orbit stable ", earth.getAltitudeOverEquator(sun) < 170e9);
-
-            if (i % (60 * 60 * 24 * 30) == 0) {
-                System.out.println("Month " + (i / (60 * 60 * 24 * 30) + 1));
-                System.out.println("Moon over earth " + moon.getAltitudeOverEquator(earth));
-                System.out.println("Earth over sun " + earth.getAltitudeOverEquator(sun));
-                System.out.println("Moon over sun " + moon.getAltitudeOverEquator(sun));
-            }
-        }
-    }
+    
 }

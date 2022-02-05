@@ -66,7 +66,7 @@ abstract class PhysicsObject {
         return velocity;
     }
 
-    private double forceToAcceleration(double force) {
+    double forceToAcceleration(double force) {
         // a = F/m
         return force / getMass();
     }
@@ -79,6 +79,10 @@ abstract class PhysicsObject {
         return getDistanceVector(partner).getLength() - partner.getRadius();
     }
 
+    double getGravitationForce(double partnerMass, double distance) {
+        return (GRAVITATIONAL_CONSTANT * getMass() * partnerMass) / (distance * distance);
+    }
+
     void addGravity(PhysicsObject partner, double deltaTime) {
         // get distance and direction of force
         Vector3d distanceVector = getDistanceVector(partner);
@@ -86,7 +90,7 @@ abstract class PhysicsObject {
         Vector3d directionVector = distanceVector.normalize();
 
         // calculate force F = G*m1*m2/d² and convert to acceleration a = F/m1
-        double gravityForce = (GRAVITATIONAL_CONSTANT * getMass() * partner.getMass()) / (distance * distance);
+        double gravityForce = getGravitationForce(partner.getMass(), distance);
         //assert gravityForce != Double.NaN;
         double gravityAcceleration = forceToAcceleration(gravityForce);
         //assert gravityAcceleration != Double.NaN;
@@ -95,11 +99,11 @@ abstract class PhysicsObject {
         velocity = velocity.add(directionVector.multiply(gravityAcceleration).multiply(deltaTime));
     }
 
-    double calculateDragForAxis(double fluidDensity, double velocity) {
+    double calculateDragForce(double fluidDensity, double velocity) {
         // calculate drag force 
-        double dragForce = 0.5 * getDragCoefficient() * fluidDensity * getDragArea() * (velocity * velocity);
-        //assert dragForce != Double.NaN;
-        return forceToAcceleration(dragForce);
+        double dragForce = getDragCoefficient() * ((fluidDensity * (velocity * velocity)) / 2.0) * getDragArea();
+
+        return dragForce;
     }
 
     void addDrag(Planetoid planetoid, double deltaTime) {
@@ -109,11 +113,11 @@ abstract class PhysicsObject {
 
         double fluidDensity = planetoid.getAtmosphereDensity(distance);
         if (fluidDensity > 0) {
-            velocity.subtract(new Vector3d(
+            /*velocity.subtract(new Vector3d(
                 calculateDragForAxis(fluidDensity, velocity.getX()),
                 calculateDragForAxis(fluidDensity, velocity.getY()),
                 calculateDragForAxis(fluidDensity, velocity.getZ())
-            ).multiply(deltaTime));
+            ).multiply(deltaTime));*/
         }
     }
 
