@@ -10,6 +10,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BackgroundImage;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.media.Media;
@@ -30,6 +32,7 @@ public class Window extends Application {
     MediaPlayer mediaPlayer;
     
     TripleMeter meter;
+	ImageView packplate;
 	
 
     public void onButtonClick(MouseEvent e) {
@@ -65,30 +68,36 @@ public class Window extends Application {
 			FileInputStream fIn = new FileInputStream(inFile);
 			FXMLLoader loader = new FXMLLoader();
 			this.root = loader.load(fIn);
-				Scene scene = new Scene(this.root);
-				
-				String[] nameList = {"#imgButton1", "#imgButton2"}; // reengineer better way to add those infos. this has the elegance of a bison in a china shop
-				for (String btnName: nameList) {
+			Scene scene = new Scene(this.root);
+			
+			packplate = (ImageView)this.root.lookup("#backplate");
+			packplate.setImage(new Image(new File("res/backplate.png").toURI().toString()));
+
+			String[] nameList = {"#imgButton1", "#imgButton2"}; // reengineer better way to add those infos. this has the elegance of a bison in a china shop
+			for (String btnName: nameList) {
 				ImageButton imgb = (ImageButton)this.root.lookup(btnName);
 				imgb.setImage(this.img_btn_off);
 				imgb.setOnMouseClicked(e -> this.onButtonClick(e)); // wtf is this syntax from hell???
 				imgb.setState(false);
 			}
 	    	
-	    	this.meter = (TripleMeter)this.root.lookup("#tripleMeter");
-	    	this.meter.initialize(
-	    	new File("res/tm_back.png").toURI().toString(),
-	    	new File("res/tm_needle_01.png").toURI().toString(),
-	    	new File("res/tm_needle_02.png").toURI().toString(),
-	    	new File("res/tm_needle_03.png").toURI().toString(),
-	    	new File("res/tm_front.png").toURI().toString(),
-	    	0.0,
-	    	100.0,
-	    	0.0,
-	    	10.0,
-	    	0.0,
-	    	10.0
-	    	);
+			String[] meterNameList = {"#tripleMeter1", "#tripleMeter2", "#tripleMeter3"};
+			for (String meterName: meterNameList) {
+				this.meter = (TripleMeter)this.root.lookup(meterName);
+				this.meter.initialize(
+				new File("res/tm_back.png").toURI().toString(),
+				new File("res/tm_needle_01.png").toURI().toString(),
+				new File("res/tm_needle_02.png").toURI().toString(),
+				new File("res/tm_needle_03.png").toURI().toString(),
+				new File("res/tm_front.png").toURI().toString(),
+				0.0,
+				100.0,
+				0.0,
+				10.0,
+				0.0,
+				10.0
+				);
+			}
 	    	
 	    	primaryStage.setTitle("Button test");
 	    	primaryStage.setScene(scene);

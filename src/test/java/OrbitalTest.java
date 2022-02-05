@@ -16,7 +16,6 @@ public class OrbitalTest {
     /* Physics and orbital mechanics with simulator to check for timing and rounding errors */
 
     @Test
-    @Ignore
     public void moonOrbitTest() {
         /* Sun, earth, moon constelation one year in fixed time steps of 0.1 seconds */
 
@@ -48,7 +47,6 @@ public class OrbitalTest {
     }
 
     @Test
-    @Ignore
     public void moonOrbitVarTimeTest() {
         /* Sun, earth, moon constelation one year in variable time steps between 0.1 and 1.1 seconds */
 
@@ -87,9 +85,8 @@ public class OrbitalTest {
     }
 
     @Test
-    @Ignore
     public void moonOrbitSpeedupVarTimeTest() {
-        /* Sun, earth, moon constelation one year in fast forward time between 0 to 3600 seconds per update */
+        /* Sun, earth, moon constelation one year in fast forward time between 1 to 3600 seconds per update */
 
         Random randomTimer = new Random();
 
@@ -106,7 +103,7 @@ public class OrbitalTest {
         double deltaTime = 0;
 
         while (currentTime < 357.0 * 24.0 * 60.0 * 60.0) { 
-            deltaTime = randomTimer.nextDouble() * 3600.0;
+            deltaTime = Math.min(randomTimer.nextDouble() * 3600.0, 1.0);
             currentTime += deltaTime;
             sim.update(deltaTime);
 
@@ -127,25 +124,29 @@ public class OrbitalTest {
 
     @Test
     public void skydiverDragTest() {
+        /* drag forces should govern known terminal velocity of skydiver */
+
         PhysicsObject sun = new Sun();
         Planetoid earth = new Earth(sun);
-        Skydiver diver = new Skydiver(earth, new Vector3d(0, 10000, 0), 50, true);
+        Skydiver diverSpread = new Skydiver(earth, new Vector3d(0, 10000, 0), 50, true);
+        Skydiver diverDive = new Skydiver(earth, new Vector3d(10000, 0, 0), 75, false);
 
         PhysicsSimulator sim = new PhysicsSimulator();
         sim.addObject((PhysicsObject)earth);
         sim.addObject(sun);
-        sim.addObject((PhysicsObject)diver);
+        sim.addObject((PhysicsObject)diverSpread);
+        sim.addObject((PhysicsObject)diverDive);
 
-        while (diver.getAltitudeOverEquator((PhysicsObject)earth) > 0) {
+        while (diverDive.getAltitudeOverEquator((PhysicsObject)earth) > 0) {
             sim.update(1.0);
-            Assert.assertTrue("Terminal velocity of 50kg skydiver horizontal should be 34m/s ", diver.getVelocity().subtract(earth.getVelocity()).getLength() < 40.0);
+            Assert.assertTrue("Terminal velocity of 50kg skydiver horizontal should be 34m/s ", diverSpread.getVelocity().subtract(earth.getVelocity()).getLength() < 40.0);
+            Assert.assertTrue("Terminal velocity of 74kg skydiver diving should be 98m/s ", diverDive.getVelocity().subtract(earth.getVelocity()).getLength() < 150.0);
         }
     }
 
-    @Ignore
     @Test
     public void vostokOrbitTest() {
-        /* in fixed time steps of 0.1 seconds */
+        /* vostok orbit must confirm to no input profile (stay in orbit for 8 to 12 days) with random time steps 0.1 to 1.1 */
 
         PhysicsObject sun = new Sun();
         Planetoid earth = new Earth(sun);
@@ -158,48 +159,29 @@ public class OrbitalTest {
         sim.addObject(sun);
         sim.addObject(vostok);
 
-        double periapsis = 900e3;
-        double totalSlowdown = 0;
+        Random randomTimer = new Random();
+        double totalTime = 0;
+        double deltaTime = 0;
 
-        FileWriter logFile;
+       while (totalTime < 8 * 24 * 60 * 60) { 
+            deltaTime = randomTimer.nextDouble() + 0.1;
+            totalTime += deltaTime;
+            sim.update(deltaTime);
 
-        try {
-            logFile = new FileWriter("log.csv");
-
-            logFile.write("iteration,altitude over equator,velocity,fluid density,drag force,drag slowdown\n");
-
-            for (int i = 0; i < 356 * 24 * 60 * 60; i++) { 
-                sim.update(1.0);
-
-                //Assert.assertTrue("Orbit stable ", vostok.getAltitudeOverEquator(earth) > 50e3);
-                //Assert.assertTrue("Orbit stable ", vostok.getAltitudeOverEquator(earth) < 220e3);
-
-                double fluidDensity = earth.getAtmosphereDensity(vostok.getDistanceVector((PhysicsObject)earth).getLength());
-
-                double dragForce = vostok.calculateDragForce(fluidDensity, vostok.getVelocity().getLength());
-
-                double slowdown = vostok.forceToAcceleration(dragForce);
-                totalSlowdown += slowdown;
-
-                logFile.write(i + "," + vostok.getAltitudeOverEquator(earth) + "," + (vostok.getVelocity().getLength()) + "," + fluidDensity + "," + dragForce + "," + slowdown + "\n");
-
-                /*
-                if (vostok.getAltitudeOverEquator(earth) < periapsis) {
-                    periapsis = vostok.getAltitudeOverEquator(earth);
-                }
-
-                if (i % (60 * 60) == 0) {
-                    System.out.println("Hour " + (i / (60 * 60) + 1));
-                    System.out.println("Vostok periapsis km " + (periapsis/1000));
-                }*/
-            }
-
-            logFile.close();
-
-        } catch (Exception e) {
-            System.out.println(e);
+            Assert.assertTrue("Orbit stable ", vostok.getAltitudeOverEquator(earth) > 10e3);
+            Assert.assertTrue("Orbit stable ", vostok.getAltitudeOverEquator(earth) < 220e3);
         }
 
-        System.out.println("total slowdown " + totalSlowdown);
+        while (totalTime < 12 * 24 * 60 * 60) { 
+            deltaTime = randomTimer.nextDouble() + 0.1;
+            totalTime += deltaTime;
+            sim.update(deltaTime);
+
+            if (vostok.getAltitudeOverEquator(earth) < 100)
+            {
+                return;
+            }
+        }
+        Assert.assertFalse("Orbit did not decay after 12 days ", true);
     }
 }

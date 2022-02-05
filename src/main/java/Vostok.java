@@ -9,7 +9,7 @@ class Vostok extends Spacecraft {
     private boolean serviceModuleAttached;
 
     Vostok(PhysicsObject parent) {
-        super(parent, 4700, 3, new Vector3d(0, 215e3, 0), new Vector3d(), new Vector3d(-7750, 0, 0), new Vector3d());
+        super(parent, 4700, 3, new Vector3d(0, 215e3, 0), new Vector3d(), new Vector3d(-7773.5, 0, 0), new Vector3d());
         serviceModuleAttached = true;
     }
 

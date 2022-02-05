@@ -106,6 +106,10 @@ abstract class PhysicsObject {
         return dragForce;
     }
 
+    Vector3d getRelativeVelocity(PhysicsObject partner) {
+        return velocity.subtract(partner.getVelocity());
+    }
+
     void addDrag(Planetoid planetoid, double deltaTime) {
         // get distance
         Vector3d distanceVector = getDistanceVector((PhysicsObject)planetoid);
@@ -113,7 +117,7 @@ abstract class PhysicsObject {
 
         double fluidDensity = planetoid.getAtmosphereDensity(distance);
         if (fluidDensity > 0) {
-            Vector3d velocityWithoutPlanetoidVelocity = velocity.subtract(planetoid.getVelocity());
+            Vector3d velocityWithoutPlanetoidVelocity = getRelativeVelocity(planetoid);
 
             double dragForce = calculateDragForce(fluidDensity, velocityWithoutPlanetoidVelocity.getLength());
 
