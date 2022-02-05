@@ -113,11 +113,15 @@ abstract class PhysicsObject {
 
         double fluidDensity = planetoid.getAtmosphereDensity(distance);
         if (fluidDensity > 0) {
-            /*velocity.subtract(new Vector3d(
-                calculateDragForAxis(fluidDensity, velocity.getX()),
-                calculateDragForAxis(fluidDensity, velocity.getY()),
-                calculateDragForAxis(fluidDensity, velocity.getZ())
-            ).multiply(deltaTime));*/
+            Vector3d velocityWithoutPlanetoidVelocity = velocity.subtract(planetoid.getVelocity());
+
+            double dragForce = calculateDragForce(fluidDensity, velocityWithoutPlanetoidVelocity.getLength());
+
+            double dragSlowdown = forceToAcceleration(dragForce);
+            
+            Vector3d slowdownVector = velocityWithoutPlanetoidVelocity.normalize().multiply(-1.0).multiply(dragSlowdown).multiply(deltaTime);
+
+            velocity = velocity.add(slowdownVector);
         }
     }
 
