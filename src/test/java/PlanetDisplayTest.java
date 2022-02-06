@@ -16,15 +16,15 @@ public class PlanetDisplayTest extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        PlanetDisplay pDisplay = new PlanetDisplay(250, 250);
+        PlanetDisplay pDisplay = new PlanetDisplay(500, 500);
 
-        pDisplay.initialize(new File("res/backplate.png").toURI().toString());
+        pDisplay.initialize(new File("target/res/map.png").toURI().toString()); // because the tests are executed from the root directory
 
-        pDisplay.setFocusPoint(50, 70);
+        pDisplay.setFocusPoint(250, 450);
 
         StackPane root = new StackPane();
         root.getChildren().add(pDisplay);
-        primaryStage.setScene(new Scene(root, 400, 400));
+        primaryStage.setScene(new Scene(root, 600, 600));
         primaryStage.show();
     }
 
