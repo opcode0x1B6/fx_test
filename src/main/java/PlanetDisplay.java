@@ -39,9 +39,19 @@ class PlanetDisplay extends Canvas {
         return getDistanceToCenter(posX, posY, middleX, middleY) <= radius;
     }
 
-    double multiplyOffsetToCenter(double posX, double posY, double middleX, double middleY, double radius) {
+    double multiplyOffsetToCenterLinear(double posX, double posY, double middleX, double middleY, double radius) {
         double dist = getDistanceToCenter(posX, posY, middleX, middleY);
         return 1.0 + (dist / radius);
+    }
+
+    double multiplyOffsetToCenter(double posX, double posY, double middleX, double middleY, double radius) {
+        double dist = getDistanceToCenter(posX, posY, middleX, middleY);
+
+        double distFactor = (dist / radius);
+
+        double curveModifier = 1.0 / (2.0 - distFactor);
+
+        return curveModifier;// + (dist / radius);
     }
 
     void clearScreen() {
@@ -115,12 +125,7 @@ class PlanetDisplay extends Canvas {
                 posX = (int)middleX + (int)(rx * multiplyOffsetToCenter((double)rx, (double)ry, 0, 0, radius)) + posXWrapOffset + (int)x;
                 //posX = (int)(outputPosX);
                 //System.out.println("posX " + posX);
-                if (posX < 0) { 
-                    posX = imgWidth - (int)(Math.abs(posX) % imgWidth);
-                }
-                while (posX >= imgWidth) { 
-                    posX = (int)(Math.abs(posX) % imgWidth);
-                }
+                posX = (int)(Math.abs(posX) % imgWidth);
                 //System.out.println("posX " + posX);
 
                 this.contextWriter.setColor(outputPosX, outputPosY, mapReader.getColor(posX, posY));
