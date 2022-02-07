@@ -53,6 +53,7 @@ class PlanetDisplay extends Canvas {
 
         int posX = 0;
         int posY = 0;
+        int posXWrapOffset = 0;
 
         int outputPosX = 0;
         int outputPosY = 0;
@@ -70,8 +71,22 @@ class PlanetDisplay extends Canvas {
                 if (!isInCircle((double)outputPosX, (double)outputPosY, middleX, middleY, radius)) {
                     continue;
                 }
+
+                posY = (int)middleY + (int)(ry * multiplyOffsetToCenter((double)rx, (double)ry, 0, 0, radius));
+                //posY = (int)(outputPosY);
+                //System.out.println("posY " + posY);
+                posXWrapOffset = 0;
+                while (posY < 0) { 
+                    posY += imgHeight;
+                    posXWrapOffset += imgWidth/2;
+                }
+                while (posY >= imgHeight) { 
+                    posY -= imgHeight;
+                    posXWrapOffset += imgWidth/2;
+                }
+
                 //System.out.println("rx " + rx + " ry " + ry);
-                posX = (int)middleX + (int)(rx * multiplyOffsetToCenter((double)rx, (double)ry, 0, 0, radius));
+                posX = (int)middleX + (int)(rx * multiplyOffsetToCenter((double)rx, (double)ry, 0, 0, radius)) + posXWrapOffset;
                 //posX = (int)(outputPosX);
                 //System.out.println("posX " + posX);
                 while (posX < 0) { 
@@ -81,15 +96,7 @@ class PlanetDisplay extends Canvas {
                     posX -= imgWidth;
                 }
 
-                posY = (int)middleY + (int)(ry * multiplyOffsetToCenter((double)rx, (double)ry, 0, 0, radius));
-                //posY = (int)(outputPosY);
-                //System.out.println("posY " + posY);
-                while (posY < 0) { 
-                    posY += imgHeight;
-                }
-                while (posY >= imgHeight) { 
-                    posY -= imgHeight;
-                }
+                
 
                 this.contextWriter.setColor(outputPosX, outputPosY, mapReader.getColor(posX, posY));
             }
