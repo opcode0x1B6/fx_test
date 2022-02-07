@@ -29,44 +29,69 @@ class PlanetDisplay extends Canvas {
         graphicsContext.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
-    boolean isInCircle(double posX, double posY, double middleX, double middleY, double radius) {
+    double getDistanceToCenter(double posX, double posY, double middleX, double middleY) {
         double distX = posX - middleX;
         double distY = posY - middleY;
         double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
-        return dist <= radius;
+        return dist;
+    }
+
+    boolean isInCircle(double posX, double posY, double middleX, double middleY, double radius) {
+        return getDistanceToCenter(posX, posY, middleX, middleY) <= radius;
+    }
+
+    double multiplyOffsetToCenter(double posX, double posY, double middleX, double middleY, double radius) {
+        double dist = getDistanceToCenter(posX, posY, middleX, middleY);
+        return 1.0 + (dist / radius);
     }
 
     public void setFocusPoint(double x, double y) {
         System.out.println("setting focus ");
 
-        int startX = (int)(x - this.getWidth()/2);
-        int startY = (int)(y - this.getHeight()/2);
+        double middleX = this.getWidth()/2;
+        double middleY = this.getHeight()/2;
 
         int posX = 0;
         int posY = 0;
 
-        for (int rx = 0; rx < (int)this.getWidth(); rx++) {
-            for (int ry = 0; ry < (int)this.getHeight(); ry++) {
-                if (!isInCircle((double)rx, (double)ry, this.getWidth()/2, this.getHeight()/2, this.getWidth()/2)) {
+        int outputPosX = 0;
+        int outputPosY = 0;
+
+        double radius = Math.min(middleX, middleY);
+
+        int imgWidth = (int)planetMapImage.getWidth();
+        int imgHeight = (int)planetMapImage.getHeight();
+
+        for (int rx = (int)-middleX; rx < (int)middleX; rx++) {
+            for (int ry = (int)-middleY; ry < (int)middleY; ry++) {
+                //System.out.println("rx " + rx + " ry " + ry);
+                outputPosX = (int)(middleX + rx);
+                outputPosY = (int)(middleY + ry);
+                if (!isInCircle((double)outputPosX, (double)outputPosY, middleX, middleY, radius)) {
                     continue;
                 }
-                posX = startX + rx;
-                if (posX < 0) { 
-                    posX += (int)(planetMapImage.getWidth());
+                //System.out.println("rx " + rx + " ry " + ry);
+                posX = (int)middleX + (int)(rx * multiplyOffsetToCenter((double)rx, (double)ry, 0, 0, radius));
+                //posX = (int)(outputPosX);
+                //System.out.println("posX " + posX);
+                while (posX < 0) { 
+                    posX += imgWidth;
                 }
-                if (posX >= (int)planetMapImage.getWidth()) { 
-                    posX -= (int)(planetMapImage.getWidth());
-                }
-
-                posY = startY + ry;
-                if (posY < 0) { 
-                    posY += (int)(planetMapImage.getHeight());
-                }
-                if (posY >= (int)planetMapImage.getHeight()) { 
-                    posY -= (int)(planetMapImage.getHeight());
+                while (posX >= imgWidth) { 
+                    posX -= imgWidth;
                 }
 
-                this.contextWriter.setColor(rx, ry, mapReader.getColor(posX, posY));
+                posY = (int)middleY + (int)(ry * multiplyOffsetToCenter((double)rx, (double)ry, 0, 0, radius));
+                //posY = (int)(outputPosY);
+                //System.out.println("posY " + posY);
+                while (posY < 0) { 
+                    posY += imgHeight;
+                }
+                while (posY >= imgHeight) { 
+                    posY -= imgHeight;
+                }
+
+                this.contextWriter.setColor(outputPosX, outputPosY, mapReader.getColor(posX, posY));
             }
         }
     }
