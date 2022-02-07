@@ -19,6 +19,7 @@ public class PlanetDisplayTest extends Application {
 
     int focusX;
     int focusY;
+    double rotation;
     PlanetDisplay pDisplay;
 
     @Override
@@ -29,6 +30,7 @@ public class PlanetDisplayTest extends Application {
 
         focusX = 250;
         focusY = 450;
+        rotation = 0.0;
         pDisplay.setFocusPoint(focusX, focusY);
 
         
@@ -55,7 +57,17 @@ public class PlanetDisplayTest extends Application {
                 System.out.println("D key was pressed");
                 focusX += 20;
             }
-            System.out.println(focusY);
+            if (e.getCode() == KeyCode.Q) {
+                System.out.println("Q key was pressed");
+                rotation -= 10.0;
+            }
+            if (e.getCode() == KeyCode.E) {
+                System.out.println("E key was pressed");
+                rotation += 10.0;
+            }
+            //rotation = Math.abs(rotation) % 360;
+            System.out.println("fX " + focusX + " fY " + focusY + " rot " + rotation);
+            pDisplay.setRotation(rotation);
             pDisplay.setFocusPoint(focusX, focusY);
         });
 

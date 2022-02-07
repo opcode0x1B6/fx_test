@@ -6,12 +6,15 @@ import javafx.scene.*;
 import javafx.scene.paint.*;
 import javafx.scene.canvas.*;
 import javafx.scene.image.*;
+import javafx.scene.transform.Rotate;
 
 class PlanetDisplay extends Canvas {
     Image planetMapImage;
     GraphicsContext graphicsContext;
     PixelWriter contextWriter;
     PixelReader mapReader;
+
+    Rotate rotation;
 
     PlanetDisplay(double width, double height) {
         super(width, height);
@@ -25,7 +28,14 @@ class PlanetDisplay extends Canvas {
 
         System.out.println("initialized image " + this.planetMapImage);
 
+        this.rotation = new Rotate(0, this.getWidth()/2, this.getHeight()/2);
+		this.getTransforms().add(this.rotation);
+
         clearScreen();
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation.setAngle(rotation);
     }
 
     double getDistanceToCenter(double posX, double posY, double middleX, double middleY) {
@@ -55,8 +65,8 @@ class PlanetDisplay extends Canvas {
     }
 
     void clearScreen() {
-        graphicsContext.setFill(javafx.scene.paint.Color.PINK);
-        graphicsContext.fillRect(0, 0, this.getWidth(), this.getHeight());
+        //graphicsContext.setFill(javafx.scene.paint.Color.PINK);
+        graphicsContext.clearRect(0, 0, this.getWidth(), this.getHeight());
     }
 
     double longitudeFromMapPosition(double posX, double mapWidth) {
