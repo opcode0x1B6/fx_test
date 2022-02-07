@@ -49,6 +49,24 @@ class PlanetDisplay extends Canvas {
         graphicsContext.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
+    double longitudeFromMapPosition(double posX, double mapWidth) {
+        return (posX/mapWidth * Math.PI * 2.0);
+        //return posX/mapWidth*360.0;
+    }
+
+    double latitudeFromMapPosition(double posY, double mapHeight) {
+        return (posY/mapHeight * Math.PI * 2.0);
+        //return posY/mapHeight*360.0-180.0;
+    }
+
+    double posXOrthographicProjection(double radius, double longitude, double latitude, double longitudeOrigin) {
+        return radius * Math.cos(latitude) * Math.sin(longitude - longitudeOrigin);
+    }
+
+    double posYOrthographicProjection(double radius, double longitude, double latitude, double longitudeOrigin, double latitudeOrigin) {
+        return radius * ( Math.cos(latitudeOrigin) * Math.sin(latitude) - Math.sin(latitudeOrigin) * Math.cos(latitude) * Math.cos(longitude - longitudeOrigin) );
+    }
+
     public void setFocusPoint(double x, double y) {
         System.out.println("setting focus ");
         clearScreen();
@@ -81,27 +99,29 @@ class PlanetDisplay extends Canvas {
                 //posY = (int)(outputPosY);
                 //System.out.println("posY " + posY);
                 posXWrapOffset = 0;
-                while (posY < 0) { 
-                    posY = imgHeight - (posY + imgHeight + 1);
-                    posXWrapOffset += imgWidth/2;
+                if ((int)(Math.abs(posY) / imgHeight) % 2 == 0) {
+                    posXWrapOffset = (int)imgWidth/2;
+                    posY = imgHeight - ((int)(Math.abs(posY) % imgHeight) + 1);
                 }
-                while (posY >= imgHeight) { 
-                    posY = imgHeight + (imgHeight - posY - 1);
-                    posXWrapOffset += imgWidth/2;
+                if (posY < 0) { 
+                    posY = (int)(Math.abs(posY) % imgHeight);
                 }
+                if (posY >= imgHeight) {
+                    posY = (int)(Math.abs(posY) % imgHeight);
+                }
+                //System.out.println("posY " + posY);
 
                 //System.out.println("rx " + rx + " ry " + ry);
                 posX = (int)middleX + (int)(rx * multiplyOffsetToCenter((double)rx, (double)ry, 0, 0, radius)) + posXWrapOffset + (int)x;
                 //posX = (int)(outputPosX);
                 //System.out.println("posX " + posX);
-                while (posX < 0) { 
-                    posX += imgWidth;
+                if (posX < 0) { 
+                    posX = imgWidth - (int)(Math.abs(posX) % imgWidth);
                 }
                 while (posX >= imgWidth) { 
-                    posX -= imgWidth;
+                    posX = (int)(Math.abs(posX) % imgWidth);
                 }
-
-                
+                //System.out.println("posX " + posX);
 
                 this.contextWriter.setColor(outputPosX, outputPosY, mapReader.getColor(posX, posY));
             }
