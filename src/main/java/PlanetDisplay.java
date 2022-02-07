@@ -58,8 +58,9 @@ class PlanetDisplay extends Canvas {
         double dist = getDistanceToCenter(posX, posY, middleX, middleY);
 
         double distFactor = (dist / radius);
+        double zoomFactor = 3.0; // normal 2.0, smaller numbers will zoom out and project more map onto the sphere
         double lensCorrectionModifier = 0.0; // will create a bigger lens distortion on negative values and lessen the distortion on positive ones
-        double curveModifier = 1.0 / (2.0 - distFactor) + lensCorrectionModifier;
+        double curveModifier = 1.0 / (zoomFactor - distFactor) + lensCorrectionModifier;
 
         return curveModifier;
     }
