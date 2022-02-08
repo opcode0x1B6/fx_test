@@ -15,6 +15,7 @@ import java.io.IOException;
 public class OrbitalTest {
     /* Physics and orbital mechanics with simulator to check for timing and rounding errors */
 
+    @Ignore
     @Test
     public void moonOrbitTest() {
         /* Sun, earth, moon constelation one year in fixed time steps of 0.1 seconds */
@@ -46,6 +47,7 @@ public class OrbitalTest {
         }
     }
 
+    @Ignore
     @Test
     public void moonOrbitVarTimeTest() {
         /* Sun, earth, moon constelation one year in variable time steps between 0.1 and 1.1 seconds */
@@ -84,6 +86,7 @@ public class OrbitalTest {
         }
     }
 
+    @Ignore
     @Test
     public void moonOrbitSpeedupVarTimeTest() {
         /* Sun, earth, moon constelation one year in fast forward time between 1 to 3600 seconds per update */
@@ -183,5 +186,40 @@ public class OrbitalTest {
             }
         }
         Assert.assertFalse("Orbit did not decay after 12 days ", true);
+    }
+
+    @Test
+    public void vostokDeorbitBurnTest() {
+        /* vostok orbit must decay within 1 day if main engine is fired retrograde with random time steps 0.1 to 1.1 */
+
+        PhysicsObject sun = new Sun();
+        Planetoid earth = new Earth(sun);
+        PhysicsObject moon = new Moon(earth);
+        Vostok vostok = new Vostok(earth, new Vector3d(1, 0, 0));
+
+        PhysicsSimulator sim = new PhysicsSimulator();
+        sim.addObject(earth);
+        sim.addObject(moon);
+        sim.addObject(sun);
+        sim.addObject(vostok);
+
+        Random randomTimer = new Random();
+        double totalTime = 0;
+        double deltaTime = 0;
+
+        MainEngineS54 mainEngine = (MainEngineS54)vostok.getModulesByName("S5.4").get(0);
+        mainEngine.activateEngine();
+
+        while (totalTime < 1 * 24 * 60 * 60) { 
+            deltaTime = randomTimer.nextDouble() + 0.1;
+            totalTime += deltaTime;
+            sim.update(deltaTime);
+
+            if (vostok.getAltitudeOverEquator(earth) < 100)
+            {
+                return;
+            }
+        }
+        Assert.assertFalse("Deorbit burn did not create a decay after 1 day ", true);
     }
 }

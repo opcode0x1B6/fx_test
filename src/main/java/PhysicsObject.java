@@ -129,6 +129,10 @@ abstract class PhysicsObject {
         }
     }
 
+    void exertForce(double force, Vector3d direction) {
+        velocity = velocity.add(this.getRotation().multiply(direction.normalize()).multiply(forceToAcceleration(force)));
+    }
+
     void update(double deltaTime) {
         position = position.add(velocity.multiply(deltaTime));
         rotation = rotation.add(rotationalVelocity.multiply(deltaTime));
